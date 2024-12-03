@@ -1,0 +1,305 @@
+databaseChangeLog:
+  
+- includeAll:
+      path: scripts/Procedures
+      errorIfMissingOrEmpty:  false
+      
+- include:
+    file: scripts/widgets.yaml
+
+- changeSet:
+      id:  1
+      author:  asmith
+      labels: example-label
+      comment: example-comment
+      changes:
+       - createTable:
+            tableName:  person2
+            columns:
+              - column:
+                  name:  id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    primaryKey:  true
+                    nullable:  false
+              - column:
+                  name:  name
+                  type:  varchar(50)
+                  constraints:
+                    nullable:  false
+              - column:
+                  name:  address1
+                  type:  varchar(50)
+              - column:
+                  name:  address2
+                  type:  varchar(50)
+              - column:
+                  name:  city
+                  type:  varchar(30)
+
+- changeSet:
+      id:  2
+      author:  asmith
+      labels: example-label
+      comment: example-comment
+      changes:
+       - createTable:
+            tableName:  company2
+            columns:
+              - column:
+                  name:  id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    primaryKey:  true
+                    nullable:  false
+              - column:
+                  name:  name
+                  type:  varchar(50)
+                  constraints:
+                    nullable:  false
+              - column:
+                  name:  address1
+                  type:  varchar(50)
+              - column:
+                  name:  address2
+                  type:  varchar(50)
+              - column:
+                  name:  city
+                  type:  varchar(30)
+
+- changeSet:
+      id:  3
+      author:  asmith
+      labels: example-label
+      comment: example-comment
+      changes:
+       - addColumn:
+            tableName:  person2
+            columns:
+              - column:
+                  name:  country
+                  type:  varchar(2)
+                  
+- changeSet:
+    id:  createProcedure-example
+    author:  asmith
+    changes:
+    -  createProcedure:
+        procedureBody:  |-
+          CREATE PROCEDURE simpleproc2 (OUT param1 INT)
+             BEGIN
+              SELECT COUNT(*) INTO param1 FROM t;
+             END;
+        procedureName: new_customer
+        replaceIfExists: true
+    rollback:
+    - sql: 
+        sql: DROP PROCEDURE simpleproc2;
+
+-  changeSet:
+    id:  createIndex-example
+    author:  asmith
+    changes:
+    - createIndex:
+       clustered:  true
+       columns:
+       - column:
+          descending:  true
+          name:  address1
+       indexName:  idx_address
+       schemaName:  horses
+       tableName:  person2
+       tablespace:  A String
+       unique:  true
+       
+- include:
+    file: scripts/JIRA-1234/products.yaml
+    
+-  changeSet:
+    id:  tagDatabase-example
+    author:  asmith
+    changes:
+    -  tagDatabase:
+        tag:  version_1.1
+        
+- changeSet:
+      id:  resources-1
+      author: asmith
+      labels: JIRA-9876
+      comment: New table for resources
+      changes:
+       - createTable:
+            tableName:  resources
+            columns:
+              - column:
+                  name:  id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    primaryKey:  true
+                    nullable:  false
+              - column:
+                  name:  name
+                  type:  varchar(50)
+                  constraints:
+                    nullable:  false
+
+- changeSet:
+      id:  newtable-1
+      author: asmith
+      labels: JIRA-9876
+      comment: New table 01
+      changes:
+       - createTable:
+            tableName:  new_table_01
+            columns:
+              - column:
+                  name:  id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    primaryKey:  true
+                    nullable:  false
+              - column:
+                  name:  name
+                  type:  varchar(50)
+                  constraints:
+                    nullable:  false
+
+-  changeSet:
+     id:  in-place-algorithm-example
+     author:  asmith
+     changes:
+      -  sql:
+          sql: |-  
+             ALTER TABLE new_table_01
+             ADD COLUMN A VARCHAR(45) NULL DEFAULT NULL AFTER name,
+             algorithm = inplace, lock=none;
+          stripComments:  true
+     rollback:
+     - sql: 
+         sql: |-
+             ALTER TABLE new_table_01
+             DROP COLUMN A;
+
+-  changeSet:
+    id:  modifyDataType-newtable-1
+    author:  asmith
+    changes:
+    -  modifyDataType:
+        columnName:  name
+        newDataType:  blob
+        tableName:  new_table_01       
+
+-  changeSet:
+     id:  testTable_01
+     author:  asmith
+     changes:
+      -  sql:
+          sql: |
+            CREATE TABLE animals (id mediumint(9) 
+                NOT NULL AUTO_INCREMENT, 
+                name char(30) NOT NULL, 
+                PRIMARY KEY (`id`));
+                CREATE TABLE animal_count (animals int);
+                INSERT INTO animal_count (animals) VALUES(0);
+
+-  changeSet:
+    id:  testTrigger_01
+    author:  asmith
+    changes:
+    -  createTrigger:
+        triggerName:  increment_animal
+        tableName:  animals
+        replaceIfExists:  true
+        endDelimiter: '@'
+        triggerBody: |
+          CREATE TRIGGER increment_animal 
+          AFTER INSERT ON animals 
+          FOR EACH ROW 
+          UPDATE animal_count SET animal_count.animals = animal_count.animals+1;         
+
+-  changeSet:
+    id:  testTrigger_01a
+    author:  asmith
+    changes:
+    -  createTrigger:
+        triggerName:  increment_animal
+        tableName:  animals
+        replaceIfExists: true
+        endDelimiter: '@'
+        triggerBody: |
+          CREATE TRIGGER increment_animal 
+          AFTER INSERT ON animals 
+          FOR EACH ROW 
+          UPDATE animal_count SET animal_count.animals = animal_count.animals+2; 
+          
+-  changeSet:
+    id:  testTrigger_01b
+    author:  asmith
+    changes:
+    -  createTrigger:
+        triggerName:  increment_animal
+        tableName:  animals
+        replaceIfExists: true
+        endDelimiter: '@'
+        triggerBody: |
+          CREATE TRIGGER increment_animal 
+          AFTER INSERT ON animals 
+          FOR EACH ROW 
+          UPDATE animal_count SET animal_count.animals = animal_count.animals+3;
+          
+          
+-  changeSet:
+    id:  testTrigger_02
+    author:  asmith
+    changes:
+    -  createTrigger:
+        triggerName:  increment_animal_02
+        tableName:  animals
+        replaceIfExists: true
+        endDelimiter: '@'
+        triggerBody: |
+          CREATE TRIGGER increment_animal_02 
+          AFTER INSERT ON animals 
+          FOR EACH ROW 
+          UPDATE animal_count SET animal_count.animals = animal_count.animals+1;
+    rollback:
+    -  createTrigger:
+        triggerName:  increment_animal_02
+        tableName:  animals
+        replaceIfExists: true
+        endDelimiter: '@'
+        triggerBody: |
+          CREATE TRIGGER increment_animal_02 
+          AFTER INSERT ON animals 
+          FOR EACH ROW 
+          UPDATE animal_count SET animal_count.animals = animal_count.animals+3;
+
+-  changeSet:
+     id:  tag_machine_resources_01
+     author:  asmith
+     changes:
+      -  sql:
+          sql: |
+            CREATE TABLE tag_machine_resources (id mediumint(9) 
+                NOT NULL AUTO_INCREMENT, 
+                name char(30) NOT NULL, 
+                tag_target_key char(30), 
+                PRIMARY KEY (`id`));
+
+-  changeSet:
+     id:  tag_machine_resources_02
+     author:  asmith
+     changes:
+      -  sql:
+          sql: |
+            CREATE TABLE tag_machine_resource_audit_trail (resource_id int,
+                resource_arn char(30),
+                action char(30),
+                column_name char(30),
+                old_value char(30),
+                new_value char(30),
+                date_created date);

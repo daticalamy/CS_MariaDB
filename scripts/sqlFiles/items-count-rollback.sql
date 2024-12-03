@@ -1,0 +1,1 @@
+DROP PROCEDURE `horses`.`items_count`;

@@ -1,0 +1,109 @@
+databaseChangeLog:
+- changeSet:
+      id:  products
+      author:  asmith
+      labels: products
+      comment: add products table
+      changes:
+       - createTable:
+            tableName:  products
+            columns:
+              - column:
+                  name:  id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    primaryKey:  true
+                    nullable:  false
+              - column:
+                  name:  name
+                  type:  varchar(50)
+                  constraints:
+                    nullable:  false
+
+- changeSet:
+    id: products-sku
+    author: asmith
+    changes:
+      - addColumn:
+          tableName: products
+          columns:
+          - column:
+              name: sku
+              type: varchar(50)
+              
+              
+-  changeSet:
+    id:  products-sku-index
+    author:  asmith
+    changes:
+    - createIndex:
+       clustered:  false
+       columns:
+       - column:
+          descending:  false
+          name:  sku
+       indexName:  idx_sku
+       tableName:  products
+       unique:  true
+
+- changeSet:
+    id:  products-count
+    author:  asmith
+    changes:
+    -  createProcedure:
+        procedureBody:  |-
+          CREATE PROCEDURE products_count (OUT param1 INT)
+             BEGIN
+              SELECT COUNT(*) INTO param1 FROM products;
+             END;
+        procedureName: products_count
+        replaceIfExists: true
+    rollback:
+    - sql: 
+        sql: DROP PROCEDURE products_count;
+        
+- changeSet:
+    id:  products-count-v2
+    author:  asmith
+    changes:
+    -  createProcedure:
+        procedureBody:  |-
+          CREATE PROCEDURE products_count (OUT param1 INT)
+             BEGIN
+              SELECT COUNT(id) INTO param1 FROM products;
+             END;
+        procedureName: products_count
+        replaceIfExists: true
+    rollback:
+    -  createProcedure:
+        procedureBody:  |-
+          CREATE PROCEDURE products_count (OUT param1 INT)
+             BEGIN
+              SELECT COUNT(*) INTO param1 FROM products;
+             END;
+        procedureName: products_count
+        replaceIfExists: true
+        
+-  changeSet:
+    id:  products-view
+    author:  asmith
+    changes:
+    -  createView:
+        replaceIfExists:  true
+        selectQuery:  select id, name from products where sku is not null
+        viewName:  products_vw
+        
+-  changeSet:
+    id:  products-view-v2
+    author:  asmith
+    changes:
+    -  createView:
+        replaceIfExists:  true
+        selectQuery:  select id, name, sku from products where sku is not null
+        viewName:  products_vw
+    rollback:
+    -  createView:
+        replaceIfExists:  true
+        selectQuery:  select id, name from products where sku is not null
+        viewName:  products_vw

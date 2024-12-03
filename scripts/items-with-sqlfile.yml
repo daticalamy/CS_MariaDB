@@ -1,0 +1,26 @@
+databaseChangeLog:
+- changeSet:
+      id:  items
+      author:  asmith
+      labels: items
+      comment: add items table
+      changes:
+       - sqlFile:
+            path: sqlFiles/items.sql
+            relativeToChangelogFile: true
+       - rollback:
+            path: sqlFiles/items-rollback.sql
+            relativeToChangelogFile: true
+
+- changeSet:
+      id:  items-count
+      author:  asmith
+      labels: items-count
+      comment: add items count procedure
+      changes:
+       - sqlFile:
+            path: sqlFiles/items-count.sql
+            relativeToChangelogFile: true
+       - rollback:
+            path: sqlFiles/items-count-rollback.sql
+            relativeToChangelogFile: true

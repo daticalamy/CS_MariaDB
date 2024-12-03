@@ -1,0 +1,38 @@
+databaseChangeLog:
+- changeSet:
+      id:  widgets
+      author:  asmith
+      labels: widgets
+      comment: add widgets table
+      changes:
+       - createTable:
+            tableName:  widgets
+            columns:
+              - column:
+                  name:  id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    primaryKey:  true
+                    nullable:  false
+              - column:
+                  name:  name
+                  type:  varchar(50)
+                  constraints:
+                    nullable:  false
+
+- changeSet:
+    id:  widgets-count
+    author:  asmith
+    changes:
+    -  createProcedure:
+        procedureBody:  |-
+          CREATE OR REPLACE PROCEDURE widgets_count (OUT param1 INT)
+             BEGIN
+              SELECT COUNT(*) INTO param1 FROM widgets;
+             END;
+        procedureName: widgets_count
+        replaceIfExists: true
+    rollback:
+    - sql: 
+        sql: DROP PROCEDURE widgets_count;
